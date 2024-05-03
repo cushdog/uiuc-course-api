@@ -14,9 +14,19 @@ def get_db_connection():
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
+    conn = get_db_connection()
+    cursor = conn.cursor()
     words = query.split()
-    class_name, course_number = words[0].upper(), words[1]
-    return jsonify(search_and_format(class_name, course_number))
+    if len(words) == 2:  # Assuming a format like "CS 415"
+        subject, number = words
+        cursor.execute("SELECT * FROM classes WHERE subject = ? AND number = ?", (subject, number))
+    else:  # Assuming a format like "CS" for subject search
+        subject = words[0]
+        cursor.execute("SELECT * FROM classes WHERE subject = ?", (subject,))
+    results = cursor.fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in results])
+
 
 def pull_from_table(class_name, course_number):
     conn = get_db_connection()
