@@ -30,9 +30,8 @@ def search():
 
     results = cursor.fetchall()
     conn.close()
-    # Convert fetched data to a list of dicts
-    results_list = [dict(row) for row in results] if results else []
-    return jsonify(results_list)
+    
+    return results
 
 if __name__ == '__main__':
     app.run(debug=True)
