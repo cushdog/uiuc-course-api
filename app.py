@@ -25,7 +25,7 @@ def search():
         cursor.execute("SELECT * FROM classes WHERE subject = ?", (subject,))
     results = cursor.fetchall()
     conn.close()
-    return jsonify([dict(row) for row in results])
+    return results
 
 
 def pull_from_table(class_name, course_number):
