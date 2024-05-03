@@ -3,34 +3,53 @@ from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__)
-CORS(app)  # Simplified CORS; adjust as necessary for your deployment scenario
+CORS(app, resources={r"/search": {"origins": "http://localhost:3000"}})  # Enabling CORS for the search route
 
 DATABASE = 'master.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row  # Important for enabling dictionary-like access to row results
     return conn
 
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
-    if not query:
-        return jsonify({"error": "No query provided"}), 400
+    words = query.split()
+    if len(words) == 1:
+        class_name = words[0].upper()
+        return jsonify(search_and_format_subject(class_name))
+    else:
+        class_name, course_number = words[0].upper(), words[1]
+        return jsonify(search_and_format(class_name, course_number))
 
+def pull_from_table(class_name, course_number):
     conn = get_db_connection()
     cursor = conn.cursor()
-    words = query.split()
-    if len(words) == 2:  # Format like "CS 415"
-        subject, number = words
-        cursor.execute("SELECT * FROM classes WHERE subject = ? AND number = ?", (subject.upper(), number))
-    else:  # Format like "CS" for subject search
-        subject = words[0]
-        cursor.execute("SELECT * FROM classes WHERE subject = ?", (subject.upper(),))
-
+    query = "SELECT * FROM classes WHERE subject = ? AND number = ?;"
+    cursor.execute(query, (class_name, course_number))
     results = cursor.fetchall()
     conn.close()
-    
+    if not results:
+        return "Course not found"
+    return results[0]
+
+def search_and_format(class_name, course_number):
+    info_list = pull_from_table(class_name, course_number)
+    return info_list
+
+def search_and_format_subject(class_name):
+    info_list = pull_from_table(class_name)
+    return info_list
+
+def pull_from_table_subject(class_name):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = "SELECT * FROM classes WHERE subject = ?;"
+    cursor.execute(query, (class_name,))
+    results = cursor.fetchall()
+    conn.close()
+    if not results:
+        return "Course not found"
     return results
 
 if __name__ == '__main__':
