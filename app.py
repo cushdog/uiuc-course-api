@@ -54,7 +54,7 @@ def pull_from_table_subject(class_name):
     conn.close()
     if not results:
         return "Course not found"
-    return results
+    return results[0]
 
 if __name__ == '__main__':
     app.run(debug=True)
