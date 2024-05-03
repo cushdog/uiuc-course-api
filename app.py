@@ -44,17 +44,19 @@ def search_and_format_subject(class_name):
 def pull_from_table_subject(class_name):
     conn = get_db_connection()
     cursor = conn.cursor()
+    year = "2024"
+    term = "Spring"
     # This query needs to be adjusted based on your data structure and needs
     query = """
     SELECT * FROM classes 
-    WHERE subject = ? AND term = (SELECT MAX(term) FROM classes WHERE subject = ?);
+    WHERE subject = ? AND term = ? AND year = ?;
     """
-    cursor.execute(query, (class_name, class_name))
+    cursor.execute(query, (class_name, term, year,))
     results = cursor.fetchall()
     conn.close()
     if not results:
         return "Course not found"
-    return results[0]
+    return results
 
 if __name__ == '__main__':
     app.run(debug=True)
