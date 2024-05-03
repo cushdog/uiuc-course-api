@@ -3,7 +3,7 @@ import sqlite3
 
 app = Flask(__name__)
 
-DATABASE = '/Users/tylercushing/Desktop/code stuff/course explorer directors cut/uiuc-course-bot-redux-main/master.db'
+DATABASE = 'master.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
