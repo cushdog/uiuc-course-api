@@ -44,8 +44,12 @@ def search_and_format_subject(class_name):
 def pull_from_table_subject(class_name):
     conn = get_db_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM classes WHERE subject = ?;"
-    cursor.execute(query, (class_name,))
+    # This query needs to be adjusted based on your data structure and needs
+    query = """
+    SELECT * FROM classes 
+    WHERE subject = ? AND term = (SELECT MAX(term) FROM classes WHERE subject = ?);
+    """
+    cursor.execute(query, (class_name, class_name))
     results = cursor.fetchall()
     conn.close()
     if not results:
