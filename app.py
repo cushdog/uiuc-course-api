@@ -3,45 +3,36 @@ from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__)
-CORS(app, resources={r"/search": {"origins": "http://localhost:3000"}})  # Enabling CORS for the search route
+CORS(app)  # Simplified CORS; adjust as necessary for your deployment scenario
 
 DATABASE = 'master.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row  # Important for enabling dictionary-like access to row results
     return conn
 
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
+    if not query:
+        return jsonify({"error": "No query provided"}), 400
+
     conn = get_db_connection()
     cursor = conn.cursor()
     words = query.split()
-    if len(words) == 2:  # Assuming a format like "CS 415"
+    if len(words) == 2:  # Format like "CS 415"
         subject, number = words
-        cursor.execute("SELECT * FROM classes WHERE subject = ? AND number = ?", (subject, number))
-    else:  # Assuming a format like "CS" for subject search
+        cursor.execute("SELECT * FROM classes WHERE subject = ? AND number = ?", (subject.upper(), number))
+    else:  # Format like "CS" for subject search
         subject = words[0]
-        cursor.execute("SELECT * FROM classes WHERE subject = ?", (subject,))
+        cursor.execute("SELECT * FROM classes WHERE subject = ?", (subject.upper(),))
+
     results = cursor.fetchall()
     conn.close()
-    return results
-
-
-def pull_from_table(class_name, course_number):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    query = "SELECT * FROM classes WHERE subject = ? AND number = ?;"
-    cursor.execute(query, (class_name, course_number))
-    results = cursor.fetchall()
-    conn.close()
-    if not results:
-        return "Course not found"
-    return results[0]
-
-def search_and_format(class_name, course_number):
-    info_list = pull_from_table(class_name, course_number)
-    return info_list
+    # Convert fetched data to a list of dicts
+    results_list = [dict(row) for row in results] if results else []
+    return jsonify(results_list)
 
 if __name__ == '__main__':
     app.run(debug=True)
