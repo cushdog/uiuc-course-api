@@ -15,6 +15,7 @@ def get_db_connection():
 def search():
     query = request.args.get('query')
     words = query.split()
+    print(words)
     if len(words) == 3:
         class_name = words[0].upper()
         semester, year = words[1], words[2]
