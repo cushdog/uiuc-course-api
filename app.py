@@ -37,7 +37,7 @@ def pull_from_table(class_name, course_number, semester, year):
     return results[0]
 
 def search_and_format(class_name, course_number, semester, year):
-    info_list = pull_from_table(class_name, course_number)
+    info_list = pull_from_table(class_name, course_number, semester, year)
     return info_list
 
 def search_and_format_subject(class_name, semester, year):
