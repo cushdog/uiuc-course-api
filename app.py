@@ -15,43 +15,42 @@ def get_db_connection():
 def search():
     query = request.args.get('query')
     words = query.split()
-    if len(words) == 1:
+    if len(words) == 3:
         class_name = words[0].upper()
-        return jsonify(search_and_format_subject(class_name))
+        semester, year = words[1], words[2]
+        return jsonify(search_and_format_subject(class_name, semester, year))
     else:
         class_name, course_number = words[0].upper(), words[1]
-        return jsonify(search_and_format(class_name, course_number))
+        semester, year = words[2], words[3]
+        return jsonify(search_and_format(class_name, course_number, semester, year))
 
-def pull_from_table(class_name, course_number):
+def pull_from_table(class_name, course_number, semester, year):
     conn = get_db_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM classes WHERE subject = ? AND number = ?;"
-    cursor.execute(query, (class_name, course_number))
+    query = "SELECT * FROM classes WHERE subject = ? AND number = ? AND term = ? AND year = ?;"
+    cursor.execute(query, (class_name, course_number, semester, year))
     results = cursor.fetchall()
     conn.close()
     if not results:
         return "Course not found"
     return results[0]
 
-def search_and_format(class_name, course_number):
+def search_and_format(class_name, course_number, semester, year):
     info_list = pull_from_table(class_name, course_number)
     return info_list
 
-def search_and_format_subject(class_name):
-    info_list = pull_from_table_subject(class_name)
+def search_and_format_subject(class_name, semester, year):
+    info_list = pull_from_table_subject(class_name, semester, year)
     return info_list
 
-def pull_from_table_subject(class_name):
+def pull_from_table_subject(class_name, semester, year):
     conn = get_db_connection()
     cursor = conn.cursor()
-    year = "2024"
-    term = "Spring"
-    # This query needs to be adjusted based on your data structure and needs
     query = """
     SELECT * FROM classes 
     WHERE subject = ? AND term = ? AND year = ?;
     """
-    cursor.execute(query, (class_name, term, year,))
+    cursor.execute(query, (class_name, semester, year,))
     results = cursor.fetchall()
     conn.close()
     if not results:
