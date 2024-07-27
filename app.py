@@ -3,7 +3,7 @@ from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__)
-CORS(app, resources={r"/search": {"origins": "http://localhost:3000", "https://course-explorer-electric-boogaloo.vercel.app"}})  # Enabling CORS for the search route
+CORS(app, resources={r"/search": {"origins": ["http://localhost:3000", "https://course-explorer-electric-boogaloo.vercel.app"]}})  # Enabling CORS for the search route
 
 DATABASE = 'master.db'
 
