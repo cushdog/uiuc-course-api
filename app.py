@@ -55,6 +55,8 @@ def search():
     else:
         class_name, course_number = words[0].upper(), words[1]
         semester, year = words[2], words[3]
+        print("Class name: " + class_name)
+        print("Course number: " + str(course_number))
         return jsonify(search_and_format(class_name, course_number, semester, year))
 
 @app.route('/prereq-search', methods=['GET'])
