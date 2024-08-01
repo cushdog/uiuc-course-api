@@ -9,6 +9,7 @@ DATABASE = 'master.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row  # This allows us to fetch rows as dictionaries
     return conn
 
 @app.route('/search', methods=['GET'])
@@ -27,11 +28,7 @@ def search():
 @app.route('/prereq-search', methods=['GET'])
 def prereq_search():
     course = request.args.get('course')
-    print("Course")
-    print(course)
     results = search_prereqs(course)
-    print("Results")
-    print(results)
     return jsonify([dict(row) for row in results])
 
 def search_prereqs(course):
