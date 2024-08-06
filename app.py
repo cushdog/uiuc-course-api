@@ -14,7 +14,7 @@ def get_db_connection():
 def pull_from_table(class_name, course_number, semester, year):
     conn = get_db_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM classes WHERE subject = ? AND number = ? AND term = ? AND year = ?;"
+    query = "SELECT * FROM classes WHERE subject = ? AND course_number = ? AND semester = ? AND year = ?;"
     cursor.execute(query, (class_name, course_number, semester, year))
     results = cursor.fetchall()
     conn.close()
@@ -35,7 +35,7 @@ def pull_from_table_subject(class_name, semester, year):
     cursor = conn.cursor()
     query = """
     SELECT * FROM classes 
-    WHERE subject = ? AND term = ? AND year = ?;
+    WHERE subject = ? AND semester = ? AND year = ?;
     """
     cursor.execute(query, (class_name, semester, year,))
     results = cursor.fetchall()
@@ -55,8 +55,7 @@ def search():
     else:
         class_name, course_number = words[0].upper(), words[1]
         semester, year = words[2], words[3]
-        print("Class name: " + class_name)
-        print("Course number: " + str(course_number))
+        
         return jsonify(search_and_format(class_name, course_number, semester, year))
 
 @app.route('/prereq-search', methods=['GET'])
@@ -73,8 +72,6 @@ def search_prereqs(course):
     results = cursor.fetchall()
     conn.close()
     return results
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
