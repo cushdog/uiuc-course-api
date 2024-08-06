@@ -14,7 +14,7 @@ def get_db_connection():
 def pull_from_table(class_name, course_number, semester, year):
     conn = get_db_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM classes WHERE subject = ? AND course_number = ? AND semester = ? AND year = ?;"
+    query = "SELECT * FROM courses WHERE subject = ? AND course_number = ? AND semester = ? AND year = ?;"
     cursor.execute(query, (class_name, course_number, semester, year))
     results = cursor.fetchall()
     conn.close()
@@ -34,7 +34,7 @@ def pull_from_table_subject(class_name, semester, year):
     conn = get_db_connection()
     cursor = conn.cursor()
     query = """
-    SELECT * FROM classes 
+    SELECT * FROM courses 
     WHERE subject = ? AND semester = ? AND year = ?;
     """
     cursor.execute(query, (class_name, semester, year,))
@@ -67,7 +67,7 @@ def prereq_search():
 def search_prereqs(course):
     conn = get_db_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM classes WHERE section_info LIKE ?"
+    query = "SELECT * FROM courses WHERE section_info LIKE ?"
     cursor.execute(query, (f'%{course}%',))
     results = cursor.fetchall()
     conn.close()
