@@ -64,6 +64,19 @@ def prereq_search():
     results = search_prereqs(course)
     return jsonify(results)
 
+@app.route('/sections', methods=['GET'])
+def sections():
+    query = request.args.get('query')
+    words = query.split()
+    class_name, course_number, semester, year = words[0].upper(), words[1], words[2], words[3]
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = "SELECT * FROM sections WHERE subject = ? AND course_number = ? AND semester = ? AND year = ?;"
+    cursor.execute(query, (class_name, course_number, semester, year))
+    results = cursor.fetchall()
+    conn.close()
+    return jsonify(results)
+
 def search_prereqs(course):
     conn = get_db_connection()
     cursor = conn.cursor()
