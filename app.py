@@ -71,7 +71,7 @@ def sections():
     class_name, course_number, semester, year = words[0].upper(), words[1], words[2], words[3]
     conn = get_db_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM sections WHERE subject = ? AND course_number = ? AND semester = ? AND year = ?;"
+    query = "SELECT * FROM courses WHERE subject = ? AND course_number = ? AND semester = ? AND year = ?;"
     cursor.execute(query, (class_name, course_number, semester, year))
     results = cursor.fetchall()
     conn.close()
