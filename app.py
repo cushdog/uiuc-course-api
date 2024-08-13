@@ -80,7 +80,7 @@ def sections():
 def search_prereqs(course):
     conn = get_db_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM courses WHERE section_info LIKE ?"
+    query = "SELECT * FROM courses WHERE description LIKE ?"
     cursor.execute(query, (f'%{course}%',))
     results = cursor.fetchall()
     conn.close()
