@@ -7,6 +7,7 @@ import sqlite3
 import boto3
 import json
 import uuid
+import os
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "https://course-explorer-electric-boogaloo.vercel.app"]}})
@@ -103,6 +104,9 @@ def search_prereqs(course):
 
 def get_secret():
 
+    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+
     secret_name = "CourseExplorerCookie"
     region_name = "us-east-1"
     
@@ -111,7 +115,7 @@ def get_secret():
         aws_secret_access_key=aws_secret_access_key,
         region_name=region_name
     )
-    
+
     client = session.client(
         service_name='secretsmanager',
         region_name=region_name
