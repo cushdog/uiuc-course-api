@@ -72,27 +72,6 @@ def profSearch():
     
     return jsonify(result)
 
-
-@app.route('/all-search', methods=['GET'])
-def allSearch():
-    query = request.args.get('query')
-    words = query.split()
-
-    semester, year = words[0], words[1]
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    sql_query = """
-        SELECT DISTINCT *
-        FROM courses
-        WHERE semester = ?
-        AND year = ?
-    """
-    cursor.execute(sql_query, (semester, year))
-    result = cursor.fetchall()
-    
-    return jsonify(result)
-
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
