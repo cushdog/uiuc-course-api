@@ -74,7 +74,7 @@ def profSearch():
 
 
 @app.route('/all-search', methods=['GET'])
-def profSearch():
+def allSearch():
     query = request.args.get('query')
     words = query.split()
 
