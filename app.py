@@ -63,9 +63,9 @@ def profSearch():
     sql_query = """
         SELECT DISTINCT *
         FROM courses
-        WHERE instructor LIKE %s
-        AND semester = %s
-        AND year = %s
+        WHERE instructor LIKE ?
+        AND semester = ?
+        AND year = ?
     """
     cursor.execute(sql_query, ('%' + last_name + '%', semester, year))
     result = cursor.fetchall()
