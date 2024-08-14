@@ -51,6 +51,27 @@ def pull_from_table_subject(class_name, semester, year):
         return "Course not found"
     return results
 
+@app.route('/prof-search', methods=['GET'])
+def profSearch():
+    query = request.args.get('query')
+    words = query.split()
+
+    last_name, semester, year = words[0], words[1], words[2], words[3]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    sql_query = """
+        SELECT DISTINCT *
+        FROM courses
+        WHERE instructor LIKE %s
+        AND semester = %s
+        AND year = %s
+    """
+    cursor.execute(sql_query, ('%' + last_name + '%', semester, year))
+    result = cursor.fetchall()
+    
+    return jsonify(result)
+
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query')
@@ -76,12 +97,14 @@ def sections():
     query = request.args.get('query')
     words = query.split()
     class_name, course_number, semester, year = words[0].upper(), words[1], words[2], words[3]
+
     conn = get_db_connection()
     cursor = conn.cursor()
     query = "SELECT * FROM courses WHERE subject = ? AND course_number = ? AND semester = ? AND year = ?;"
     cursor.execute(query, (class_name, course_number, semester, year))
     results = cursor.fetchall()
     conn.close()
+
     return jsonify(results)
 
 @app.route('/seat-search', methods=['GET'])
