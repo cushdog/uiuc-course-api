@@ -56,7 +56,7 @@ def profSearch():
     query = request.args.get('query')
     words = query.split()
 
-    last_name, semester, year = words[0], words[1], words[2], words[3]
+    last_name, semester, year = words[0], words[1], words[2]
 
     conn = get_db_connection()
     cursor = conn.cursor()
