@@ -72,7 +72,7 @@ def profSearch():
     
     return jsonify(result)
 
-@app.route('/master-subj-search', methods=['GET'])
+@app.route('/master-search', methods=['GET'])
 def readFile():
     with open('subject_ids.txt', 'r') as file:
         data = file.read()
