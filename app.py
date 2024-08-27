@@ -7,6 +7,7 @@ import sqlite3
 import boto3
 import json
 import uuid
+import csv
 import os
 
 app = Flask(__name__)
@@ -77,6 +78,16 @@ def readFile():
     with open('subject_ids.txt', 'r') as file:
         data = file.read()
     return data
+
+@app.route('/interest-search', methods=['GET'])
+def interest():
+    query = request.args.get('query')
+    with open('areas_of_interest.csv', 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if row[0] == query:
+                return row
+    return None
 
 @app.route('/search', methods=['GET'])
 def search():
