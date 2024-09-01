@@ -36,8 +36,14 @@ def profSearch():
         AND year = ?
     """
     params = ('%' + last_name + '%', semester, year)
+    return jsonify(execute_query(query, params))
 
-
+@app.route('/gpa-search', methods=['GET'])
+def gpaSearch():
+    query = request.args.get('query')
+    words = query.split()
+    query = """SELECT * FROM courses WHERE subject = ? AND course_number = ?;"""
+    params = (words[0].upper(), words[1])
     return jsonify(execute_query(query, params))
 
 @app.route('/master-search', methods=['GET'])
