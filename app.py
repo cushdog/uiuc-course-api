@@ -7,7 +7,7 @@ import sqlite3
 import csv
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://localhost:8080", "https://course-explorer-electric-boogaloo.vercel.app"]}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 DATABASE = 'master.db'
 
