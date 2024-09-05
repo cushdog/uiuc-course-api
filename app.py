@@ -146,7 +146,7 @@ def seat_search():
     return jsonify(results)
 
 @app.route('/subject-info', methods=['GET'])
-def subject_info(subject):
+def subject_info():
     subject = request.args.get('subject')
     if not subject:
         return jsonify({'error': 'Missing subject parameter'}), 400
