@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 from flask_cors import CORS
 import requests
 import sqlite3
+import json
 import csv
 
 app = Flask(__name__)
@@ -227,6 +228,7 @@ def class_info():
     url = f'https://courses.illinois.edu/cisapp/explorer/schedule/2024/fall/{subject}/{class_num}.xml'
 
     try:
+
         # Fetch the XML content
         response = requests.get(url)
         response.raise_for_status()  # Raises an exception for 4xx/5xx responses
@@ -235,8 +237,24 @@ def class_info():
         # Parse the XML content and return it as JSON
         json_data = parse_course_xml(xml_content)
         return jsonify(json_data)
+    
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/old-api', methods=['GET'])
+def oldApi():
+
+    query = request.args.get('query')
+    words = query.split()
+    subject, class_num, field = words[0].upper(), words[1], words[2]
+
+    query = "SELECT DISTINCT * FROM courses WHERE subject = ? AND course_number = ? AND semester = 'fall' AND year = 2024;"
+    params = (subject, class_num)
+
+    results = execute_query(query, params)[0]
+    old_api_data = json.loads(results[-1])
+
+    return jsonify(old_api_data[field])
 
 if __name__ == '__main__':
     app.run(debug=True)
