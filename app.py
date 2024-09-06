@@ -254,7 +254,14 @@ def oldApi():
     results = execute_query(query, params)[0]
     old_api_data = json.loads(results[-1])
 
-    return jsonify(old_api_data[field])
+    result_string = "None"
+
+    if field in old_api_data:
+        result_string = old_api_data[field]
+
+
+
+    return jsonify(result_string)
 
 if __name__ == '__main__':
     app.run(debug=True)
