@@ -213,30 +213,30 @@ def subject_info():
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)}), 500
     
-# @app.route('/class-info', methods=['GET'])
-# def class_info():
+@app.route('/class-info', methods=['GET'])
+def class_info():
 
-#     query = request.args.get('class')
-#     words = query.split()
-#     subject, class_num = words[0].upper(), words[1]
+    query = request.args.get('class')
+    words = query.split()
+    subject, class_num = words[0].upper(), words[1]
 
-#     if not query:
-#         return jsonify({'error': 'Missing parameter'}), 400
+    if not query:
+        return jsonify({'error': 'Missing parameter'}), 400
 
-#     # Construct the URL
-#     url = f'https://courses.illinois.edu/cisapp/explorer/schedule/2024/fall/{subject}/{class_num}.xml'
+    # Construct the URL
+    url = f'https://courses.illinois.edu/cisapp/explorer/schedule/2024/fall/{subject}/{class_num}.xml'
 
-#     try:
-#         # Fetch the XML content
-#         response = requests.get(url)
-#         response.raise_for_status()  # Raises an exception for 4xx/5xx responses
-#         xml_content = response.text
+    try:
+        # Fetch the XML content
+        response = requests.get(url)
+        response.raise_for_status()  # Raises an exception for 4xx/5xx responses
+        xml_content = response.text
 
-#         # Parse the XML content and return it as JSON
-#         json_data = parse_course_xml(xml_content)
-#         return jsonify(json_data)
-#     except requests.exceptions.RequestException as e:
-#         return jsonify({'error': str(e)}), 500
+        # Parse the XML content and return it as JSON
+        json_data = parse_course_xml(xml_content)
+        return jsonify(json_data)
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
