@@ -7,6 +7,7 @@ import sqlite3
 import csv
 import pandas as pd
 import json
+import time
 
 DATABASE = 'master.db'
 
@@ -92,62 +93,77 @@ def update_section_attributes():
     conn = sqlite3.connect('master.db')
     cursor = conn.cursor()
 
-    # Add the "OLD API DATA" column if it doesn't exist
-    # cursor.execute("""
-    #     ALTER TABLE courses ADD COLUMN "ATTRIBUTES" TEXT;
-    # """)
-    # conn.commit()
-
     # Query all classes from the 'courses' table where the year is 2024 and semester is 'fall'
-    cursor.execute("SELECT subject, course_number FROM courses WHERE year = '2024' AND semester = 'fall'")
+    cursor.execute("SELECT subject, course_number FROM courses WHERE year = 2024 AND semester = 'fall'")
     classes = cursor.fetchall()
 
     for subject, class_num in classes:
+
         print(f"Fetching data for {subject} {class_num}...")
         # Fetch class information
         class_data = class_info(subject, class_num)
+
+        time.sleep(1)
 
         degree_attribute = "sectionDegreeAttributes"
 
         if degree_attribute in class_data:
             # Extract the degree attribute from the class data
             degree_attribute_value = class_data[degree_attribute]
+        else:
+            degree_attribute_value = "None"
+
+        value_to_insert = json.dumps(class_data)
+
+        print("VALUE TO INSERT", value_to_insert)
+        print("DEGREE ATTRIBUTE VALUE", degree_attribute_value)
+
+        
 
         # Update the corresponding row in the database with the full JSON data
         cursor.execute("""
             UPDATE courses
             SET "ATTRIBUTES" = ?
-            WHERE subject = ? AND course_number = ? AND year = '2024' AND semester = 'fall'
+            WHERE subject = ? AND course_number = ? AND year = 2024 AND semester = 'fall'
         """, (degree_attribute_value, subject, class_num))
         conn.commit()
+
+        cursor.execute("""
+            UPDATE courses
+            SET "OLD API DATA" = ?
+            WHERE subject = ? AND course_number = ? AND year = '2024' AND semester = 'fall'
+        """, (value_to_insert, subject, class_num))
+        conn.commit()
+
+        # AE 460...
 
     # Close the database connection
     conn.close()
 
-def print_distinct_attributes():
-    # Connect to the SQLite database
-    conn = sqlite3.connect('master.db')
-    cursor = conn.cursor()
+# def print_distinct_attributes():
+#     # Connect to the SQLite database
+#     conn = sqlite3.connect('master.db')
+#     cursor = conn.cursor()
 
-    try:
-        # Query to select distinct values from the ATTRIBUTES column
-        cursor.execute("SELECT DISTINCT ATTRIBUTES FROM courses")
+#     try:
+#         # Query to select distinct values from the ATTRIBUTES column
+#         cursor.execute("SELECT DISTINCT ATTRIBUTES FROM courses")
 
-        # Fetch all distinct values
-        distinct_attributes = cursor.fetchall()
+#         # Fetch all distinct values
+#         distinct_attributes = cursor.fetchall()
 
-        # Print each distinct attribute value
-        for attribute in distinct_attributes:
-            print(attribute[0])  # Assuming ATTRIBUTES is a single column
+#         # Print each distinct attribute value
+#         for attribute in distinct_attributes:
+#             print(attribute[0])  # Assuming ATTRIBUTES is a single column
 
-    except sqlite3.Error as e:
-        print(f"An error occurred: {e}")
+#     except sqlite3.Error as e:
+#         print(f"An error occurred: {e}")
 
-    finally:
-        # Close the database connection
-        conn.close()
+#     finally:
+#         # Close the database connection
+#         conn.close()
 
-# Call the function
-print_distinct_attributes()
+# # Call the function
+# print_distinct_attributes()
 
-# update_section_attributes()
+update_section_attributes()
