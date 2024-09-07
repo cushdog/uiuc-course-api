@@ -93,10 +93,10 @@ def update_section_attributes():
     cursor = conn.cursor()
 
     # Add the "OLD API DATA" column if it doesn't exist
-    cursor.execute("""
-        ALTER TABLE courses ADD COLUMN "OLD API DATA" TEXT;
-    """)
-    conn.commit()
+    # cursor.execute("""
+    #     ALTER TABLE courses ADD COLUMN "ATTRIBUTES" TEXT;
+    # """)
+    # conn.commit()
 
     # Query all classes from the 'courses' table where the year is 2024 and semester is 'fall'
     cursor.execute("SELECT subject, course_number FROM courses WHERE year = '2024' AND semester = 'fall'")
@@ -106,19 +106,48 @@ def update_section_attributes():
         print(f"Fetching data for {subject} {class_num}...")
         # Fetch class information
         class_data = class_info(subject, class_num)
-        
-        # Convert the JSON data to a string to store it in the database
-        class_data_json = json.dumps(class_data)
+
+        degree_attribute = "sectionDegreeAttributes"
+
+        if degree_attribute in class_data:
+            # Extract the degree attribute from the class data
+            degree_attribute_value = class_data[degree_attribute]
 
         # Update the corresponding row in the database with the full JSON data
         cursor.execute("""
             UPDATE courses
-            SET "OLD API DATA" = ?
+            SET "ATTRIBUTES" = ?
             WHERE subject = ? AND course_number = ? AND year = '2024' AND semester = 'fall'
-        """, (class_data_json, subject, class_num))
+        """, (degree_attribute_value, subject, class_num))
         conn.commit()
 
     # Close the database connection
     conn.close()
 
-update_section_attributes()
+def print_distinct_attributes():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('master.db')
+    cursor = conn.cursor()
+
+    try:
+        # Query to select distinct values from the ATTRIBUTES column
+        cursor.execute("SELECT DISTINCT ATTRIBUTES FROM courses")
+
+        # Fetch all distinct values
+        distinct_attributes = cursor.fetchall()
+
+        # Print each distinct attribute value
+        for attribute in distinct_attributes:
+            print(attribute[0])  # Assuming ATTRIBUTES is a single column
+
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        # Close the database connection
+        conn.close()
+
+# Call the function
+print_distinct_attributes()
+
+# update_section_attributes()

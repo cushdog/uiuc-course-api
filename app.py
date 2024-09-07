@@ -259,8 +259,25 @@ def oldApi():
     if field in old_api_data:
         result_string = old_api_data[field]
 
+    return jsonify(result_string)
 
+@app.route('/requirements', methods=['GET'])
+def oldApi():
 
+    query = request.args.get('query')
+    words = query.split()
+    requirement = words[0]
+
+    query = "SELECT DISTINCT * FROM courses WHERE ATTRIBUTES = ? AND semester = 'fall' AND year = 2024;"
+    params = (requirement)
+
+    results = execute_query(query, params)
+
+    result_string = "None"
+
+    if results is not None:
+        return jsonify(result_string)
+    
     return jsonify(result_string)
 
 if __name__ == '__main__':
