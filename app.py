@@ -265,11 +265,9 @@ def oldApi():
 def requirementsSearch():
 
     query = request.args.get('query')
-    words = query.split()
-    requirement = words[0]
 
     query = "SELECT DISTINCT * FROM courses WHERE ATTRIBUTES = ? AND semester = 'fall' AND year = 2024;"
-    params = (requirement)
+    params = (query)
 
     results = execute_query(query, params)
 

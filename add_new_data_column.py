@@ -140,30 +140,30 @@ def update_section_attributes():
     # Close the database connection
     conn.close()
 
-# def print_distinct_attributes():
-#     # Connect to the SQLite database
-#     conn = sqlite3.connect('master.db')
-#     cursor = conn.cursor()
+def print_distinct_attributes():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('master.db')
+    cursor = conn.cursor()
 
-#     try:
-#         # Query to select distinct values from the ATTRIBUTES column
-#         cursor.execute("SELECT DISTINCT ATTRIBUTES FROM courses")
+    try:
+        # Query to select distinct values from the ATTRIBUTES column
+        cursor.execute("SELECT DISTINCT ATTRIBUTES FROM courses")
 
-#         # Fetch all distinct values
-#         distinct_attributes = cursor.fetchall()
+        # Fetch all distinct values
+        distinct_attributes = cursor.fetchall()
 
-#         # Print each distinct attribute value
-#         for attribute in distinct_attributes:
-#             print(attribute[0])  # Assuming ATTRIBUTES is a single column
+        # Print each distinct attribute value
+        for attribute in distinct_attributes:
+            print(attribute[0])  # Assuming ATTRIBUTES is a single column
 
-#     except sqlite3.Error as e:
-#         print(f"An error occurred: {e}")
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
 
-#     finally:
-#         # Close the database connection
-#         conn.close()
+    finally:
+        # Close the database connection
+        conn.close()
 
-# # Call the function
-# print_distinct_attributes()
+# Call the function
+print_distinct_attributes()
 
-update_section_attributes()
+# update_section_attributes()
