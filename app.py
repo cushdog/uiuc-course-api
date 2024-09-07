@@ -264,21 +264,22 @@ def oldApi():
 @app.route('/requirements', methods=['GET'])
 def requirementsSearch():
 
-    query = request.args.get('query')
+    search_t = request.args.get('query')
 
-    query = "SELECT DISTINCT * FROM courses WHERE ATTRIBUTES = ? AND semester = 'fall' AND year = 2024;"
-    params = (query)
+    query = "SELECT DISTINCT * FROM courses WHERE ATTRIBUTES LIKE ? AND semester = 'fall' AND year = 2024;"
+    params = ('%' + search_t + '%',)
 
-    print("QUERY: ", query)
+    print("QUERY: ", search_t)
 
     results = execute_query(query, params)
 
     result_string = "None"
 
     if results is not None:
-        return jsonify(result_string)
+        return jsonify(results)
     
     return jsonify(result_string)
 
 if __name__ == '__main__':
     app.run(debug=True)
+
