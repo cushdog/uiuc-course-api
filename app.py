@@ -262,7 +262,7 @@ def oldApi():
     return jsonify(result_string)
 
 @app.route('/requirements', methods=['GET'])
-def oldApi():
+def requirementsSearch():
 
     query = request.args.get('query')
     words = query.split()
