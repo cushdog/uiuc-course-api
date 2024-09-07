@@ -269,6 +269,8 @@ def requirementsSearch():
     query = "SELECT DISTINCT * FROM courses WHERE ATTRIBUTES = ? AND semester = 'fall' AND year = 2024;"
     params = (query)
 
+    print("QUERY: ", query)
+
     results = execute_query(query, params)
 
     result_string = "None"
