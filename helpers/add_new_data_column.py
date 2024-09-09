@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from seat_search import perform_search
+from helpers.seat_search import perform_search
 import xml.etree.ElementTree as ET
 from flask_cors import CORS
 import requests

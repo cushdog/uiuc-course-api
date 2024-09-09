@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from seat_search import perform_search
+from helpers.seat_search import perform_search
 import xml.etree.ElementTree as ET
 from flask_cors import CORS
 import requests
@@ -10,7 +10,7 @@ import csv
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-DATABASE = 'master.db'
+DATABASE = 'data/master.db'
 
 def parse_course_catalog(xml_content):
     # Parse the XML content
