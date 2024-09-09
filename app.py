@@ -142,9 +142,15 @@ def gpaSearch():
 
 @app.route('/master-search', methods=['GET'])
 def readFile():
-    with open('subject_ids.txt', 'r') as file:
-        data = file.read()
-    return data
+
+    query = request.args.get('query')
+    words = query.split()
+    semester, year = words[0], words[1]
+
+    query = "SELECT DISTINCT subject FROM courses WHERE semester = ? AND year = ?;"
+    params = (semester, year)
+
+    return jsonify(execute_query(query, params))
 
 @app.route('/interest-search', methods=['GET'])
 def interest():
@@ -282,4 +288,3 @@ def requirementsSearch():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
