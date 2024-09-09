@@ -150,7 +150,10 @@ def readFile():
     query = "SELECT DISTINCT subject FROM courses WHERE semester = ? AND year = ?;"
     params = (semester, year)
 
-    return jsonify(execute_query(query, params))
+    results = execute_query(query, params)
+    flattened_result = [item[0] for item in results]
+
+    return jsonify(flattened_result)
 
 @app.route('/interest-search', methods=['GET'])
 def interest():
