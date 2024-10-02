@@ -194,6 +194,18 @@ def sections():
 
     return jsonify(execute_query(query, params))
 
+@app.route('/description', methods=['GET'])
+def description_search():
+    
+    query = request.args.get('query')
+    term = request.args.get('term')
+    semester, year = term.split()
+
+    sql_query = "SELECT * FROM courses WHERE description LIKE ? AND semester = ? AND year = ?"
+    params = (f'%{query}%', semester, year)
+
+    return jsonify(execute_query(sql_query, params))
+
 @app.route('/seat-search', methods=['GET'])
 def seat_search():
     query = request.args.get('query')
