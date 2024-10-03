@@ -6,8 +6,6 @@ import argparse
 import time
 
 
-
-
 # UPDATE SECTION
 def update_column(conn, column_name, new_value, subject, course_num, semester, year):
     conn.execute(f"UPDATE courses SET {column_name} = ? WHERE subject = ? AND course_number = ? AND semester = ? AND year = ?", (new_value,subject,course_num,semester,year,))
@@ -44,7 +42,7 @@ def updating_main(year, semester):
     base_url = f"https://courses.illinois.edu/cisapp/explorer/schedule/{year}/{semester}.xml"
     root = fetch_xml(base_url)
 
-    conn = sqlite3.connect('master.db')
+    conn = sqlite3.connect('../data/DB/master.db')
 
     for subject in root.find('subjects'):
         subject_id = subject.get('id')
@@ -77,6 +75,7 @@ def updating_main(year, semester):
 
 def fetch_xml(url):
     response = requests.get(url)
+    time.sleep(1)
     return ET.fromstring(response.content)
 
 def safe_find(root, element):
@@ -173,7 +172,7 @@ def main(year, semester):
     base_url = f"https://courses.illinois.edu/cisapp/explorer/schedule/{year}/{semester}.xml"
     root = fetch_xml(base_url)
 
-    conn = sqlite3.connect('master.db')
+    conn = sqlite3.connect('../data/DB/master.db')
     create_table(conn)
 
     for subject in root.find('subjects'):
