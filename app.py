@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from helpers.seat_search import perform_search
+from helpers.general_helpers import search_teacher
 import xml.etree.ElementTree as ET
 from flask_cors import CORS
 import requests
@@ -10,7 +11,7 @@ import csv
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-DATABASE = 'data/master.db'
+DATABASE = 'data/DB/master.db'
 
 def parse_course_catalog(xml_content):
     # Parse the XML content
@@ -196,7 +197,7 @@ def sections():
 
 @app.route('/description', methods=['GET'])
 def description_search():
-    
+
     query = request.args.get('query')
     term = request.args.get('term')
     semester, year = term.split()
@@ -300,6 +301,14 @@ def requirementsSearch():
         return jsonify(results)
     
     return jsonify(result_string)
+
+@app.route('/rmp', methods=['GET'])
+def rmpSearch():
+    query = request.args.get('query')
+    words = query.split()
+    first_name, last_name = words[0], words[1]
+
+    return jsonify(search_teacher(first_name, last_name))
 
 if __name__ == '__main__':
     app.run(debug=True)
