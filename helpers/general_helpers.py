@@ -54,7 +54,7 @@ def get_teacher_id(first_name, last_name):
     with open('data/CSVs/rmp_ids.csv', 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            if row[0] == first_name and row[1] == last_name:
+            if ((row[0] == first_name) or (row[0][0] == first_name[0])) and row[1] == last_name:
                 return row[2]
     return None
 
