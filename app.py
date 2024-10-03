@@ -304,6 +304,7 @@ def requirementsSearch():
 
 @app.route('/rmp', methods=['GET'])
 def rmpSearch():
+
     query = request.args.get('query')
     words = query.split()
     first_name, last_name = words[0], words[1]

@@ -51,7 +51,7 @@ def parse_teacher_data(raw_data):
         return None
 
 def get_teacher_id(first_name, last_name):
-    with open('../data/CSVs/rmp_ids.csv', 'r') as file:
+    with open('data/CSVs/rmp_ids.csv', 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             if row[0] == first_name and row[1] == last_name:
@@ -131,7 +131,7 @@ def fetch_teacher_info(id):
     # Check the response
     if response.status_code == 200:
         data = response.json()
-        print(data)
+        return data
     else:
         print(f"Request failed with status code: {response.status_code}")
         print(response.text)
