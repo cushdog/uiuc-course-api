@@ -202,7 +202,7 @@ def description_search():
     term = request.args.get('term')
     semester, year = term.split()
 
-    sql_query = "SELECT * FROM courses WHERE description LIKE ? AND semester = ? AND year = ?"
+    sql_query = "SELECT * FROM courses WHERE label LIKE ? AND semester = ? AND year = ?"
     params = (f'%{query}%', semester, year)
 
     return jsonify(execute_query(sql_query, params))
