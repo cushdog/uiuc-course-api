@@ -311,5 +311,14 @@ def rmpSearch():
 
     return jsonify(search_teacher(first_name, last_name))
 
+@app.route('/subject-names', methods=['GET'])
+def subject_names():
+    subjects = []
+    with open('data/CSVs/subject_names.csv', 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            subjects.append({'code': row[0], 'name': row[1]})
+    return jsonify(subjects)
+
 if __name__ == '__main__':
     app.run(debug=True)
