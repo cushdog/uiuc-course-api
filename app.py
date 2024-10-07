@@ -311,6 +311,12 @@ def rmpSearch():
 
     return jsonify(search_teacher(first_name, last_name))
 
+@app.route('/crn-search', methods=['GET'])
+def crn_search():
+    crn = request.args.get('crn')
+    query = "SELECT * FROM courses WHERE crn = ? AND semester = 'fall' AND year = 2024;"
+    return jsonify(execute_query(query, (crn,)))
+
 @app.route('/subject-names', methods=['GET'])
 def subject_names():
     subjects = []

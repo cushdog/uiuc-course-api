@@ -1,6 +1,7 @@
 import requests
 import xml.etree.ElementTree as ET
 import sqlite3
+import time
 
 # Helper Functions
 def fetch_xml(url):
@@ -24,8 +25,10 @@ def extract_main_info(root):
 
 def extract_section_info(root):
     """Extract section information, including all instructors."""
+
     info = {
         'sectionNumber': safe_find(root, 'sectionNumber'),
+        'sectionTitle': safe_find(root, 'sectionTitle'),
         'statusCode': safe_find(root, 'statusCode'),
         'sectionText': safe_find(root, 'sectionText'),
         'sectionNotes': safe_find(root, 'sectionNotes'),
@@ -147,20 +150,30 @@ def process_subject(conn, year, semester, subject):
         process_course(conn, year, semester, subject, course_id)
 
 def process_new_updates(conn, year, semester, subject, course):
-    """Update existing courses with new instructor information."""
+    """Update existing courses with new section title information if it exists."""
     print(f"Updating course: {subject} {course}")
     course_url = f"https://courses.illinois.edu/cisapp/explorer/schedule/{year}/{semester}/{subject}/{course}.xml"
     course_root = fetch_xml(course_url)
 
     for section in course_root.find('sections'):
-        section_url = section.get('href')
+        section_url = f"https://courses.illinois.edu/cisapp/explorer/schedule/{year}/{semester}/{subject}/{course}/{section.get('id')}.xml"
         try:
+
             section_root = fetch_xml(section_url)
             section_info = extract_section_info(section_root)
-            instructor_str = ', '.join(section_info['instructor']) if section_info['instructor'] else None
+            section_title = section_info['sectionTitle']
 
-            update_column(conn, "instructor", instructor_str, subject, course, semester, year, section_info['sectionNumber'])
-            print(f"  Updated section: {section_info['sectionNumber']} with instructor(s): {instructor_str}")
+            # Only update if sectionTitle exists
+            if section_title:
+                update_column(conn, "sectionTitle", section_title, subject, course, semester, year, section_info['sectionNumber'])
+                print(f"  Updated section: {section_info['sectionNumber']} with section title: {section_title}")
+            else:
+                update_column(conn, "sectionTitle", "None", subject, course, semester, year, section_info['sectionNumber'])
+                print(f"  Skipping section: {section_info['sectionNumber']} - no section title found")
+
+            update_column(conn, "CRN", section.get('id'), subject, course, semester, year, section_info['sectionNumber'])
+            print(f"  Updated CRN for section: {section_info['sectionNumber']} with CRN: {section.get('id')}")
+
         except Exception as e:
             print(f"Error updating section for {subject} {course}: {str(e)}")
 
@@ -207,6 +220,7 @@ def updating_main(year, semester):
 def update_single_course(year, semester, subject, course):
     """Update instructor information for a single course."""
     conn = sqlite3.connect('../data/DB/master.db')
+
     try:
         process_new_updates(conn, year, semester, subject, course)
         conn.commit()
@@ -220,10 +234,15 @@ if __name__ == "__main__":
     year = "2024"
     semester = "fall"
 
+    conn = sqlite3.connect('../data/DB/master.db')
+
+    # Uncomment the following line to update a single course
+    # update_single_course(year, semester, "CS", "498")
+
     # Uncomment the following line to insert data
     # main(year, semester)
 
-    # Update instructor information
+    # Update section information
     updating_main(year, semester)
 
 
