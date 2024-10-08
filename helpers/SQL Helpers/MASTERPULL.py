@@ -110,7 +110,7 @@ def insert_course(conn, year, semester, subject, course_number, main_info, secti
         section_info['sectionNotes'], section_info['sectionCappArea'], section_info['enrollmentStatus'],
         section_info['startDate'], section_info['endDate'], section_info['meetingType'],
         section_info['meetingStart'], section_info['meetingEnd'], section_info['meetingDays'],
-        section_info['meetingRoom'], section_info['meetingBuilding'], instructor_str, "None", "None", "None", "None", crn
+        section_info['meetingRoom'], section_info['meetingBuilding'], instructor_str, "None", "None", "None", section_info["sectionTitle"], crn
     ))
     conn.commit()
 
@@ -209,7 +209,7 @@ def updating_main(year, semester):
     base_url = f"https://courses.illinois.edu/cisapp/explorer/schedule/{year}/{semester}.xml"
     root = fetch_xml(base_url)
 
-    conn = sqlite3.connect('../data/DB/master.db')
+    conn = sqlite3.connect('../../data/DB/master.db')
 
     for subject in root.find('subjects'):
         subject_id = subject.get('id')
@@ -220,7 +220,7 @@ def updating_main(year, semester):
 
 def update_single_course(year, semester, subject, course):
     """Update instructor information for a single course."""
-    conn = sqlite3.connect('../data/DB/master.db')
+    conn = sqlite3.connect('../../data/DB/master.db')
 
     try:
         process_new_updates(conn, year, semester, subject, course)
@@ -247,3 +247,5 @@ if __name__ == "__main__":
 
     # Uncomment the following line to insert data
     # main(year, semester)
+
+    updating_main(year, semester)
