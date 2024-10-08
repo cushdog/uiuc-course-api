@@ -237,10 +237,8 @@ if __name__ == "__main__":
 
     conn = sqlite3.connect('../data/DB/master.db')
 
-    process_course(conn, year, semester, "CS", "173")
-
     # Uncomment the following line to update a single course
     # update_single_course(year, semester, "CS", "498")
 
     # Uncomment the following line to insert data
-    # main(year, semester)
+    main(year, semester)
