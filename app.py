@@ -12,6 +12,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 DATABASE = 'data/DB/master.db'
+GPA_DATABASE = 'data/DB/professor_stats.db'
 
 def parse_course_catalog(xml_content):
     # Parse the XML content
@@ -112,8 +113,20 @@ def execute_query(query, params):
     conn.close()
     return results
 
+def execute_gpa_query(query, params):
+    conn = get_gpa_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(query, params)
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
+    return conn
+
+def get_gpa_db_connection():
+    conn = sqlite3.connect(GPA_DATABASE)
     return conn
 
 @app.route('/prof-search', methods=['GET'])
@@ -325,6 +338,52 @@ def subject_names():
         for row in reader:
             subjects.append({'code': row[0], 'name': row[1]})
     return jsonify(subjects)
+
+@app.route('/class-average-gpas', methods=['GET'])
+def updated_average_gpas():
+    subject = request.args.get('subject', None)
+    course_number = request.args.get('course_number', None)
+    course = subject + ' ' + course_number if subject and course_number else None
+    
+    # Build the base SQL query
+    query = "SELECT class, avg_gpa FROM class_stats WHERE class = ?"
+    params = (course,)
+    
+    # Execute the query
+    results = execute_gpa_query(query, params)
+    
+    # Format the results into a JSON structure
+    gpa_data = []
+    for row in results:
+        gpa_data.append({
+            "class": row[0],
+            "average_gpa": row[1]
+        })
+    return jsonify(gpa_data)
+
+@app.route('/professor-stats', methods=['GET'])
+def professor_stats():
+    # Optional parameters to filter by professor name or class
+    class_name = request.args.get('class', None)
+    
+    # Build the base SQL query
+    query = "SELECT class, professor, avg_gpa, total_students FROM professor_stats WHERE class = ?"
+    params = (class_name,)
+    
+    # Execute the query
+    results = execute_gpa_query(query, params)
+    
+    # Format the results into a JSON structure
+    professor_data = []
+    for row in results:
+        professor_data.append({
+            "class": row[0],
+            "professor": row[1],
+            "average_gpa": row[2],
+            "total_students": row[3]
+        })
+    
+    return jsonify(professor_data)
 
 if __name__ == '__main__':
     app.run(debug=True)

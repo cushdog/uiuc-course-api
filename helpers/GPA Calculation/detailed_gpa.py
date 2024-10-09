@@ -11,6 +11,14 @@ def create_professor_stats_db():
     cursor = conn.cursor()
     
     cursor.execute('''
+    CREATE TABLE IF NOT EXISTS class_stats (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        class TEXT UNIQUE,
+        avg_gpa REAL
+    )
+    ''')
+    
+    cursor.execute('''
     CREATE TABLE IF NOT EXISTS professor_stats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         class TEXT,
@@ -44,15 +52,25 @@ def update_professor_stats():
         course_search_term = f"{subject} {course_number}"
         
         # Call perform_search with the course_search_term and an empty list for filters
-        prof_stats = perform_search(course_search_term, [])
+        result = perform_search(course_search_term, [])
         
-        if prof_stats:
-            # Insert or update professor stats for this class in the new database
-            for prof in prof_stats:
+        if result is not None:
+            class_avg_gpa, prof_stats = result
+            
+            # Insert or update class-wide stats if available
+            if class_avg_gpa is not None:
                 prof_cursor.execute('''
-                INSERT OR REPLACE INTO professor_stats (class, professor, avg_gpa, total_students)
-                VALUES (?, ?, ?, ?)
-                ''', (course_search_term, prof['prof'], float(prof['avg']), prof['total']))
+                INSERT OR REPLACE INTO class_stats (class, avg_gpa)
+                VALUES (?, ?)
+                ''', (course_search_term, class_avg_gpa))
+            
+            # Insert or update professor stats for this class if available
+            if prof_stats:
+                for prof in prof_stats:
+                    prof_cursor.execute('''
+                    INSERT OR REPLACE INTO professor_stats (class, professor, avg_gpa, total_students)
+                    VALUES (?, ?, ?, ?)
+                    ''', (course_search_term, prof['prof'], float(prof['avg']), prof['total']))
     
     prof_conn.commit()
     master_conn.close()
@@ -62,6 +80,17 @@ def print_professor_stats(class_name):
     conn = sqlite3.connect(PROFESSOR_STATS_DB_URL)
     cursor = conn.cursor()
     
+    # Fetch class-wide average GPA
+    cursor.execute('SELECT avg_gpa FROM class_stats WHERE class = ?', (class_name,))
+    class_avg = cursor.fetchone()
+    
+    if class_avg and class_avg[0] is not None:
+        print(f"Class stats for {class_name}:")
+        print(f"  Class-wide Avg GPA: {class_avg[0]:.3f}")
+    else:
+        print(f"No class-wide average GPA available for {class_name}")
+    
+    # Fetch professor stats
     cursor.execute('''
     SELECT professor, avg_gpa, total_students
     FROM professor_stats
@@ -72,11 +101,14 @@ def print_professor_stats(class_name):
     results = cursor.fetchall()
     
     if results:
-        print(f"Professor stats for {class_name}:")
+        print("Professor stats:")
         for prof, avg_gpa, total_students in results:
-            print(f"  - {prof} | Total Students: {total_students} | Avg GPA: {avg_gpa:.3f}")
+            if avg_gpa is not None and total_students is not None:
+                print(f"  - {prof} | Total Students: {total_students} | Avg GPA: {avg_gpa:.3f}")
+            else:
+                print(f"  - {prof} | Data not available")
     else:
-        print(f"No data found for {class_name}")
+        print(f"No professor data found for {class_name}")
     
     conn.close()
 

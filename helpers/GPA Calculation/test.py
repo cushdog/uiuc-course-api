@@ -104,7 +104,7 @@ def perform_search(course_search_term, filters_applied):
             for prof in prof_stats:
                 print(f"  - {prof['prof']} | Total Students: {prof['total']} | Avg GPA: {prof['avg']} | Std Dev: {prof['std']}")
 
-            return avg_gpa
+            return avg_gpa, prof_stats
         else:
             print("No matching courses found after applying filters")
 
