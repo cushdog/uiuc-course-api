@@ -12,7 +12,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 DATABASE = 'data/DB/master.db'
-GPA_DATABASE = 'data/DB/professor_stats.db'
+AVG_GPA_DATABASE = 'data/DB/professor_stats.db'
+GPA_STATS_DATABASE = 'data/DB/gpa.db'
 
 def parse_course_catalog(xml_content):
     # Parse the XML content
@@ -121,12 +122,24 @@ def execute_gpa_query(query, params):
     conn.close()
     return results
 
+def execute_gpa_stats_query(query, params):
+    conn = get_gpa_stats_connection()
+    cursor = conn.cursor()
+    cursor.execute(query, params)
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     return conn
 
 def get_gpa_db_connection():
     conn = sqlite3.connect(GPA_DATABASE)
+    return conn
+
+def get_gpa_stats_connection():
+    conn = sqlite3.connect(GPA_STATS_DATABASE)
     return conn
 
 @app.route('/prof-search', methods=['GET'])
@@ -384,6 +397,18 @@ def professor_stats():
         })
     
     return jsonify(professor_data)
+
+@app.route('/gpa-distribution', methods=['GET'])
+def gpa_distribution():
+    class_name = request.args.get('class', None)
+
+    subject, course_number = class_name.split()
+    
+    # Build the base SQL query
+    query = "SELECT percentAplus, percentA, percentAminus, percentBplus, percentB, percentBminus, percentCplus, percentC, percentCminus, percentDplus, percentD, percentDminus, percentF FROM classes WHERE subject = ? AND number = ?"
+    params = (subject, course_number)
+    
+    return jsonify(execute_gpa_stats_query(query, params))
 
 if __name__ == '__main__':
     app.run(debug=True)
