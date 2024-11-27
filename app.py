@@ -135,7 +135,7 @@ def get_db_connection():
     return conn
 
 def get_gpa_db_connection():
-    conn = sqlite3.connect(GPA_DATABASE)
+    conn = sqlite3.connect(AVG_GPA_DATABASE)
     return conn
 
 def get_gpa_stats_connection():
