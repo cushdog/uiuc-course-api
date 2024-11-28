@@ -410,5 +410,31 @@ def gpa_distribution():
     
     return jsonify(execute_gpa_stats_query(query, params))
 
+@app.route('/name-search', methods=['GET'])
+def professor_search():
+    # Get query parameters
+    department = request.args.get('department', '').lower()
+    last_name = request.args.get('last_name', '').lower()
+
+    if not department or not last_name:
+        return jsonify({'error': 'Please provide both department and last_name parameters.'}), 400
+    
+    # Load the JSON data once when the application starts
+    with open('./data/Other/professors.json', 'r') as json_file:
+        professor_data = json.load(json_file)['data']
+
+    # Search for matching professors
+    matching_professors = []
+    for prof in professor_data:
+        prof_department = prof.get('departmentname', '').lower()
+        prof_last_name = prof.get('lastname', '').lower()
+        if department in prof_department and last_name == prof_last_name:
+            matching_professors.append(prof)
+
+    if not matching_professors:
+        return jsonify({'message': 'No matching professors found.'}), 404
+
+    return jsonify(matching_professors)
+
 if __name__ == '__main__':
     app.run(debug=True)
