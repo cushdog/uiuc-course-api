@@ -340,7 +340,7 @@ def rmpSearch():
 @app.route('/crn-search', methods=['GET'])
 def crn_search():
     crn = request.args.get('crn')
-    query = "SELECT * FROM courses WHERE CRN = ?;"
+    query = "SELECT * FROM courses WHERE CRN = ? ORDER BY year DESC LIMIT 1;"
     return jsonify(execute_query(query, (crn,))[0])
 
 @app.route('/subject-names', methods=['GET'])
