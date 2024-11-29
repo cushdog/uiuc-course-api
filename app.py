@@ -471,14 +471,15 @@ def last_search():
         return jsonify({'error': 'Please provide the last_name parameter.'}), 400
     
     # Load the JSON data once when the application starts
-    with open('./data/Other/professors.json', 'r') as json_file:
+    with open('data/Other/professors.json', 'r') as json_file:
         professor_data = json.load(json_file)['data']
 
     # Search for matching professors
     matching_professors = []
     for prof in professor_data:
-        prof_last_name = prof.get('lastname', '').lower()
-        if last_name == prof_last_name:
+        prof_name = prof.get('name', '').lower()
+        if last_name.lower() in prof_name:
+            
             matching_professors.append(prof)
 
     if not matching_professors:
