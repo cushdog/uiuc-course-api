@@ -436,5 +436,31 @@ def professor_search():
 
     return jsonify(matching_professors)
 
+@app.route('/first-last-search', methods=['GET'])
+def professor_search():
+    # Get query parameters
+    first_name = request.args.get('first_name', '').lower()
+    last_name = request.args.get('last_name', '').lower()
+
+    if not first_name or not last_name:
+        return jsonify({'error': 'Please provide both department and last_name parameters.'}), 400
+    
+    # Load the JSON data once when the application starts
+    with open('./data/Other/professors.json', 'r') as json_file:
+        professor_data = json.load(json_file)['data']
+
+    # Search for matching professors
+    matching_professors = []
+    for prof in professor_data:
+        prof_first_name = prof.get('firstname', '').lower()
+        prof_last_name = prof.get('lastname', '').lower()
+        if first_name in prof_first_name and last_name == prof_last_name:
+            matching_professors.append(prof)
+
+    if not matching_professors:
+        return jsonify({'message': 'No matching professors found.'}), 404
+
+    return jsonify(matching_professors)
+
 if __name__ == '__main__':
     app.run(debug=True)
