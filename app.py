@@ -437,7 +437,7 @@ def professor_search():
     return jsonify(matching_professors)
 
 @app.route('/first-last-search', methods=['GET'])
-def professor_search():
+def first_last():
     # Get query parameters
     first_name = request.args.get('first_name', '').lower()
     last_name = request.args.get('last_name', '').lower()
