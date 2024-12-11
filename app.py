@@ -356,21 +356,20 @@ def subject_names():
 def updated_average_gpas():
     subject = request.args.get('subject', None)
     course_number = request.args.get('course_number', None)
-    course = subject + ' ' + course_number if subject and course_number else None
     
     # Build the base SQL query
-    query = "SELECT class, avg_gpa FROM class_stats WHERE class = ?"
-    params = (course,)
+    query = "SELECT * FROM classes WHERE subject = ? AND number = ?"
+    params = (subject, course_number,)
     
     # Execute the query
-    results = execute_gpa_query(query, params)
+    results = execute_gpa_stats_query(query, params)
     
     # Format the results into a JSON structure
     gpa_data = []
     for row in results:
         gpa_data.append({
-            "class": row[0],
-            "average_gpa": row[1]
+            "class": row[0] + row[1],
+            "average_gpa": row[2]
         })
     return jsonify(gpa_data)
 
@@ -486,6 +485,52 @@ def last_search():
         return jsonify({'message': 'No matching professors found.'}), 404
 
     return jsonify(matching_professors)
+
+@app.route('/enrollment-status', methods=['GET'])
+def enrollment_status():
+    # Get parameters from query string
+    year = request.args.get('year')
+    semester = request.args.get('semester')
+    subject = request.args.get('subject')
+    class_num = request.args.get('class')
+    crn = request.args.get('crn')
+    
+    # Validate required parameters
+    if not all([year, semester, subject, class_num, crn]):
+        return jsonify({'error': 'Missing required parameters'}), 400
+    
+    # Convert semester to lowercase
+    semester = semester.lower()
+    
+    # Construct the URL
+    url = f'https://courses.illinois.edu/cisapp/explorer/schedule/{year}/{semester}/{subject}/{class_num}/{crn}.xml'
+    
+    try:
+        # Fetch the XML content
+        response = requests.get(url)
+        response.raise_for_status()  # Raises an exception for 4xx/5xx responses
+        
+        # Parse the XML content
+        root = ET.fromstring(response.text)
+        
+        # Find the enrollmentStatus element
+        enrollment_status = root.find('.//enrollmentStatus')
+        
+        if enrollment_status is not None:
+            return jsonify({
+                'enrollmentStatus': enrollment_status.text,
+                'subject': subject,
+                'class': class_num,
+                'crn': crn
+            })
+        else:
+            return jsonify({'error': 'Enrollment status not found'}), 404
+        
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': f'Failed to fetch data: {str(e)}'}), 500
+    except ET.ParseError as e:
+        return jsonify({'error': f'Failed to parse XML: {str(e)}'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
