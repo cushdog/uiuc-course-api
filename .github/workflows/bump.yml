@@ -24,7 +24,7 @@ jobs:
         with:
           doc: classify
           token: dS6y9Ec8CnxDsK5UaCTE5tahq6vLfRUp
-          file: doc/api-documentation.yml
+          file: ../../doc/api-documentation.yml
   api-diff:
     if: ${{ github.event_name == 'pull_request' }}
     name: Check API diff on Bump.sh
@@ -37,7 +37,7 @@ jobs:
         with:
           doc: classify
           token: dS6y9Ec8CnxDsK5UaCTE5tahq6vLfRUp
-          file: doc/api-documentation.yml
+          file: ../../doc/api-documentation.yml
           command: diff
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
