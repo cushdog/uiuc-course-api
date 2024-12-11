@@ -1,0 +1,225 @@
+openapi: 3.0.3
+info:
+  title: UIUC Course API
+  description: A comprehensive API to retrieve and manage course-related data at the University of Illinois Urbana-Champaign.
+  version: 1.0.0
+servers:
+  - url: https://uiuc-course-api-production.up.railway.app
+    description: Local development server
+paths:
+  /prof-search:
+    get:
+      summary: Search professors by name, semester, and year
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Search query with format `last_name semester year`
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of courses taught by the professor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /gpa-search:
+    get:
+      summary: Search GPA information for a course
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Search query with format `subject course_number`
+          schema:
+            type: string
+      responses:
+        '200':
+          description: GPA data for the specified course
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /master-search:
+    get:
+      summary: Retrieve subjects for a given semester and year
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Search query with format `semester year`
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of subjects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /interest-search:
+    get:
+      summary: Retrieve areas of interest
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Search query for areas of interest
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Matching interest data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /search:
+    get:
+      summary: Search courses by subject and semester/year or specific course
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Flexible query format to search by subject, course, semester, and year
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Course data
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /subject-info:
+    get:
+      summary: Retrieve subject information as JSON
+      parameters:
+        - name: subject
+          in: query
+          required: true
+          description: Subject code (e.g., `CS`)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subject information in JSON
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Missing subject parameter
+        '500':
+          description: Error fetching or parsing data
+
+  /class-info:
+    get:
+      summary: Retrieve class information
+      parameters:
+        - name: class
+          in: query
+          required: true
+          description: Class query with format `subject class_number`
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Class details
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Missing query parameter
+        '500':
+          description: Error fetching or parsing data
+
+  /gpa-distribution:
+    get:
+      summary: Retrieve GPA distribution for a class
+      parameters:
+        - name: class
+          in: query
+          required: true
+          description: Class name with format `subject course_number`
+          schema:
+            type: string
+      responses:
+        '200':
+          description: GPA distribution data
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /class-average-gpas:
+    get:
+      summary: Retrieve average GPAs for a class
+      parameters:
+        - name: subject
+          in: query
+          required: true
+          description: Subject code
+          schema:
+            type: string
+        - name: course_number
+          in: query
+          required: true
+          description: Course number
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Average GPA data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    class:
+                      type: string
+                    average_gpa:
+                      type: number
+
+  /professor-stats:
+    get:
+      summary: Retrieve professor statistics
+      parameters:
+        - name: class
+          in: query
+          required: true
+          description: Class name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Professor statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    professor:
+                      type: string
+                    average_gpa:
+                      type: number
+                    total_students:
+                      type: integer
+
