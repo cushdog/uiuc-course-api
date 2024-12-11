@@ -25,6 +25,7 @@ jobs:
           doc: classify
           token: ${{secrets.BUMP_TOKEN}}
           file: doc/api-documentation.yml
+          auto-create: true
   api-diff:
     if: ${{ github.event_name == 'pull_request' }}
     name: Check API diff on Bump.sh
@@ -39,6 +40,7 @@ jobs:
           token: ${{secrets.BUMP_TOKEN}}
           file: doc/api-documentation.yml
           command: diff
+          auto-create: true
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           BUMP_TOKEN: ${{secrets.BUMP_TOKEN}}
